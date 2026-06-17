@@ -5,7 +5,13 @@ import {logDebug} from './log'
 
 export const API_STATUS_OK = 'OK'
 export const INSTANCE_STATE_STARTED = 'Started'
+export const INSTANCE_STATE_PULLING = 'Pulling'
 export const INSTANCE_STATE_ERROR = 'Error'
+
+export type InstanceStatus = {
+  instanceState: string
+  progress?: number
+}
 
 export type StartVMRequest = {
   vmid: string
@@ -191,7 +197,7 @@ export class VM {
     }
   }
 
-  async getState(vmid: string): Promise<string> {
+  async getState(vmid: string): Promise<InstanceStatus> {
     try {
       const response = await this.client.get<ListVMResponseSingle>(
         `/api/v1/vm?id=${encodeURIComponent(vmid)}`
@@ -222,7 +228,12 @@ export class VM {
         throw new Error(errorMsg.trim())
       }
 
-      return response.data.body.instance_state
+      const {instance_state: instanceState, progress} = response.data.body
+
+      return {
+        instanceState,
+        ...(progress !== undefined ? {progress} : {})
+      }
     } catch (error) {
       throw createAxiosError(error)
     }

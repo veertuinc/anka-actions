@@ -127,7 +127,44 @@ test('get VM state successful', async () => {
     server.listen(4444, () => {
       const vm = new VM('http://127.0.0.1:4444')
       expect(vm.getState('vmid'))
-        .resolves.toEqual('Scheduling')
+        .resolves.toEqual({instanceState: 'Scheduling', progress: 0})
+        .then(result => {
+          server.close()
+          resolve(result)
+        })
+        .catch(reason => {
+          server.close()
+          reject(reason)
+        })
+    })
+  })
+})
+
+test('get VM state pulling includes progress', async () => {
+  const server = http.createServer(function (req, res) {
+    const chunks: Array<Uint8Array> = []
+    req.on('data', chunk => {
+      chunks.push(chunk)
+    })
+    req.on('end', () => {
+      expect(req.method).toEqual('GET')
+      expect(req.url).toEqual(`/api/v1/vm?id=vmid`)
+    })
+
+    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Connection', 'close')
+    res.end(
+      Buffer.from(
+        fs.readFileSync('__tests__/fixtures/list-vm-single-state-pulling.json')
+      )
+    )
+  })
+
+  return new Promise((resolve, reject) => {
+    server.listen(4444, () => {
+      const vm = new VM('http://127.0.0.1:4444')
+      expect(vm.getState('vmid'))
+        .resolves.toEqual({instanceState: 'Pulling', progress: 0.42})
         .then(result => {
           server.close()
           resolve(result)

@@ -7,7 +7,8 @@ import {
   Runner,
   VM,
   StartVMRequest,
-  INSTANCE_STATE_STARTED
+  INSTANCE_STATE_STARTED,
+  INSTANCE_STATE_PULLING
 } from 'anka-actions-common'
 
 export type ActionParams = {
@@ -91,11 +92,17 @@ export async function doAction(
   let vmState
   logInfo(`[VM] waiting for the VM instance to start...`)
   do {
-    vmState = await vm.getState(instanceId)
+    const vmStatus = await vm.getState(instanceId)
+    vmState = vmStatus.instanceState
     if (vmState !== INSTANCE_STATE_STARTED) {
       await sleep(params.pollDelay * 1000)
     }
-    logInfo(`[VM] state: ${vmState}`)
+    const progressSuffix =
+      vmState === INSTANCE_STATE_PULLING &&
+      vmStatus.progress !== undefined
+        ? ` (${Math.round(vmStatus.progress * 100)}%)`
+        : ''
+    logInfo(`[VM] state: ${vmState}${progressSuffix}`)
   } while (vmState !== INSTANCE_STATE_STARTED)
 
   let runnerId: number | null = null

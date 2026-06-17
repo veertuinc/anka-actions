@@ -1,6 +1,11 @@
 export declare const API_STATUS_OK = "OK";
 export declare const INSTANCE_STATE_STARTED = "Started";
+export declare const INSTANCE_STATE_PULLING = "Pulling";
 export declare const INSTANCE_STATE_ERROR = "Error";
+export type InstanceStatus = {
+    instanceState: string;
+    progress?: number;
+};
 export type StartVMRequest = {
     vmid: string;
     tag?: string;
@@ -87,7 +92,7 @@ export declare class VM {
     private client;
     constructor(baseURL: string, rootToken?: string, httpsAgentCa?: string, httpsAgentCert?: string, httpsAgentKey?: string, httpsAgentPassphrase?: string, httpsAgentSkipCertVerify?: boolean);
     start(actionId: string, repoUrl: string, runnerToken: string, templateRunnerDir: string, body: StartVMRequest): Promise<string>;
-    getState(vmid: string): Promise<string>;
+    getState(vmid: string): Promise<InstanceStatus>;
     getInstanceId(actionId: string): Promise<string | null>;
     terminate(instanceId: string): Promise<void>;
 }

@@ -200,13 +200,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VM = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
+exports.VM = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_PULLING = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
 const axios = __importStar(__nccwpck_require__(2441));
 const https_1 = __importDefault(__nccwpck_require__(5687));
 const axiosError_1 = __nccwpck_require__(4866);
 const log_1 = __nccwpck_require__(7115);
 exports.API_STATUS_OK = 'OK';
 exports.INSTANCE_STATE_STARTED = 'Started';
+exports.INSTANCE_STATE_PULLING = 'Pulling';
 exports.INSTANCE_STATE_ERROR = 'Error';
 class VM {
     constructor(baseURL, rootToken, httpsAgentCa, httpsAgentCert, httpsAgentKey, httpsAgentPassphrase, httpsAgentSkipCertVerify) {
@@ -285,7 +286,8 @@ class VM {
                     }
                     throw new Error(errorMsg.trim());
                 }
-                return response.data.body.instance_state;
+                const { instance_state: instanceState, progress } = response.data.body;
+                return Object.assign({ instanceState }, (progress !== undefined ? { progress } : {}));
             }
             catch (error) {
                 throw (0, axiosError_1.createAxiosError)(error);
