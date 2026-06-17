@@ -38,6 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VM = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
 const axios = __importStar(require("axios"));
 const https_1 = __importDefault(require("https"));
+const axiosError_1 = require("./axiosError");
 const log_1 = require("./log");
 exports.API_STATUS_OK = 'OK';
 exports.INSTANCE_STATE_STARTED = 'Started';
@@ -97,7 +98,7 @@ class VM {
                 return response.data.body[0];
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
@@ -122,7 +123,7 @@ class VM {
                 return response.data.body.instance_state;
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
@@ -141,7 +142,7 @@ class VM {
                 return null;
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
@@ -159,23 +160,9 @@ class VM {
                 }
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
 }
 exports.VM = VM;
-function createError(error) {
-    if (error instanceof axios.AxiosError && error.response) {
-        if (error.response.status === 400) {
-            throw new Error(`Controller responded with an error: ${JSON.stringify(error.response.data)}`);
-        }
-        else {
-            throw new Error(`HTTP request failed: status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`);
-        }
-    }
-    else if (error instanceof axios.AxiosError && error.request) {
-        throw new Error(`Controller request failed: ${error.cause}`);
-    }
-    throw error;
-}

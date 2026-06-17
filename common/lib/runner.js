@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Runner = void 0;
 const axios = __importStar(require("axios"));
+const axiosError_1 = require("./axiosError");
 const log_1 = require("./log");
 const RUNNERS_PER_PAGE = 100;
 class Runner {
@@ -59,7 +60,13 @@ class Runner {
             let collected = 0;
             let totalCount = 0;
             do {
-                const response = yield this.client.get(this.runnersPath(), { params: { per_page: RUNNERS_PER_PAGE, page } });
+                let response;
+                try {
+                    response = yield this.client.get(this.runnersPath(), { params: { per_page: RUNNERS_PER_PAGE, page } });
+                }
+                catch (error) {
+                    throw (0, axiosError_1.createAxiosError)(error);
+                }
                 (0, log_1.logDebug)(`listSelfHostedRunners page ${page}: ${JSON.stringify(response.data)}`);
                 totalCount = response.data.total_count;
                 const { runners } = response.data;
@@ -78,14 +85,24 @@ class Runner {
     }
     createToken() {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.client.post(`${this.runnersPath()}/registration-token`);
-            (0, log_1.logDebug)(`createRegistrationToken: ${JSON.stringify(response.data)}`);
-            return response.data.token;
+            try {
+                const response = yield this.client.post(`${this.runnersPath()}/registration-token`);
+                (0, log_1.logDebug)(`createRegistrationToken: ${JSON.stringify(response.data)}`);
+                return response.data.token;
+            }
+            catch (error) {
+                throw (0, axiosError_1.createAxiosError)(error);
+            }
         });
     }
     delete(runnerId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.client.delete(`${this.runnersPath()}/${runnerId}`);
+            try {
+                yield this.client.delete(`${this.runnersPath()}/${runnerId}`);
+            }
+            catch (error) {
+                throw (0, axiosError_1.createAxiosError)(error);
+            }
         });
     }
 }

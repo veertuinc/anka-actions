@@ -1,5 +1,6 @@
 import * as axios from 'axios'
 import https from 'https'
+import {createAxiosError} from './axiosError'
 import {logDebug} from './log'
 
 export const API_STATUS_OK = 'OK'
@@ -186,7 +187,7 @@ export class VM {
 
       return response.data.body[0]
     } catch (error) {
-      throw createError(error)
+      throw createAxiosError(error)
     }
   }
 
@@ -223,7 +224,7 @@ export class VM {
 
       return response.data.body.instance_state
     } catch (error) {
-      throw createError(error)
+      throw createAxiosError(error)
     }
   }
 
@@ -250,7 +251,7 @@ export class VM {
 
       return null
     } catch (error) {
-      throw createError(error)
+      throw createAxiosError(error)
     }
   }
 
@@ -274,29 +275,7 @@ export class VM {
         throw new Error(`API response status:${response.data.status}`)
       }
     } catch (error) {
-      throw createError(error)
+      throw createAxiosError(error)
     }
   }
-}
-
-function createError(error: any): Error {
-  if (error instanceof axios.AxiosError && error.response) {
-    if (error.response.status === 400) {
-      throw new Error(
-        `Controller responded with an error: ${JSON.stringify(
-          error.response.data
-        )}`
-      )
-    } else {
-      throw new Error(
-        `HTTP request failed: status: ${
-          error.response.status
-        }, data: ${JSON.stringify(error.response.data)}`
-      )
-    }
-  } else if (error instanceof axios.AxiosError && error.request) {
-    throw new Error(`Controller request failed: ${error.cause}`)
-  }
-
-  throw error
 }

@@ -1,4 +1,5 @@
 import * as axios from 'axios'
+import {createAxiosError} from './axiosError'
 import {logDebug} from './log'
 
 interface GitHubRunner {
@@ -47,10 +48,15 @@ export class Runner {
     let totalCount = 0
 
     do {
-      const response = await this.client.get<ListRunnersResponse>(
-        this.runnersPath(),
-        {params: {per_page: RUNNERS_PER_PAGE, page}}
-      )
+      let response
+      try {
+        response = await this.client.get<ListRunnersResponse>(
+          this.runnersPath(),
+          {params: {per_page: RUNNERS_PER_PAGE, page}}
+        )
+      } catch (error) {
+        throw createAxiosError(error)
+      }
       logDebug(
         `listSelfHostedRunners page ${page}: ${JSON.stringify(response.data)}`
       )
@@ -75,15 +81,23 @@ export class Runner {
   }
 
   async createToken(): Promise<string> {
-    const response = await this.client.post<RegistrationTokenResponse>(
-      `${this.runnersPath()}/registration-token`
-    )
-    logDebug(`createRegistrationToken: ${JSON.stringify(response.data)}`)
+    try {
+      const response = await this.client.post<RegistrationTokenResponse>(
+        `${this.runnersPath()}/registration-token`
+      )
+      logDebug(`createRegistrationToken: ${JSON.stringify(response.data)}`)
 
-    return response.data.token
+      return response.data.token
+    } catch (error) {
+      throw createAxiosError(error)
+    }
   }
 
   async delete(runnerId: number): Promise<void> {
-    await this.client.delete(`${this.runnersPath()}/${runnerId}`)
+    try {
+      await this.client.delete(`${this.runnersPath()}/${runnerId}`)
+    } catch (error) {
+      throw createAxiosError(error)
+    }
   }
 }

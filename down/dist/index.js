@@ -1,6 +1,164 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 4866:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createAxiosError = void 0;
+const axios = __importStar(__nccwpck_require__(2441));
+const SENSITIVE_HEADER_NAMES = new Set([
+    'authorization',
+    'cookie',
+    'set-cookie',
+    'proxy-authorization',
+    'x-api-key',
+    'x-auth-token'
+]);
+const SENSITIVE_FIELD_NAMES = new Set([
+    'token',
+    'password',
+    'secret',
+    'passphrase',
+    'startup_script',
+    'gh-pat',
+    'gh_pat',
+    'controller-auth-cert',
+    'controller-auth-cert-key',
+    'controller-root-token'
+]);
+const REDACTED = '[REDACTED]';
+function redactHeaderName(name) {
+    return SENSITIVE_HEADER_NAMES.has(name.toLowerCase());
+}
+function redactFieldName(name) {
+    return SENSITIVE_FIELD_NAMES.has(name.toLowerCase());
+}
+function redactValue(value) {
+    if (value === null || value === undefined) {
+        return value;
+    }
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+            (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+            try {
+                return redactValue(JSON.parse(trimmed));
+            }
+            catch (_a) {
+                return value;
+            }
+        }
+        return value;
+    }
+    if (Array.isArray(value)) {
+        return value.map(item => redactValue(item));
+    }
+    if (typeof value === 'object') {
+        return Object.fromEntries(Object.entries(value).map(([key, fieldValue]) => [
+            key,
+            redactFieldName(key) ? REDACTED : redactValue(fieldValue)
+        ]));
+    }
+    return value;
+}
+function redactHeaders(headers) {
+    if (!headers) {
+        return undefined;
+    }
+    return Object.fromEntries(Object.entries(headers).map(([name, value]) => [
+        name,
+        redactHeaderName(name) ? REDACTED : value
+    ]));
+}
+function formatRequest(config) {
+    var _a, _b;
+    if (!config) {
+        return {};
+    }
+    const request = {
+        method: (_a = config.method) === null || _a === void 0 ? void 0 : _a.toUpperCase(),
+        url: axios.default.getUri(config)
+    };
+    const headers = redactHeaders(config.headers);
+    if (headers && Object.keys(headers).length > 0) {
+        request.headers = headers;
+    }
+    if (config.auth) {
+        request.auth = {
+            username: (_b = config.auth.username) !== null && _b !== void 0 ? _b : '',
+            password: config.auth.password ? REDACTED : undefined
+        };
+    }
+    if (config.data !== undefined && config.data !== '') {
+        request.body = redactValue(config.data);
+    }
+    if (config.params && Object.keys(config.params).length > 0) {
+        request.params = redactValue(config.params);
+    }
+    return request;
+}
+function formatResponse(response) {
+    return {
+        status: response.status,
+        statusText: response.statusText,
+        headers: redactHeaders(response.headers),
+        body: redactValue(response.data)
+    };
+}
+function createAxiosError(error) {
+    if (!(error instanceof axios.AxiosError)) {
+        if (error instanceof Error) {
+            return error;
+        }
+        return new Error(String(error));
+    }
+    if (error.response) {
+        const details = {
+            request: formatRequest(error.config),
+            response: formatResponse(error.response)
+        };
+        return new Error(`HTTP request failed: ${JSON.stringify(details, null, 2)}`);
+    }
+    if (error.request) {
+        const details = {
+            request: formatRequest(error.config),
+            message: error.message
+        };
+        return new Error(`HTTP request failed (no response): ${JSON.stringify(details, null, 2)}`);
+    }
+    return new Error(error.message);
+}
+exports.createAxiosError = createAxiosError;
+
+
+/***/ }),
+
 /***/ 8103:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -45,6 +203,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VM = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
 const axios = __importStar(__nccwpck_require__(2441));
 const https_1 = __importDefault(__nccwpck_require__(5687));
+const axiosError_1 = __nccwpck_require__(4866);
 const log_1 = __nccwpck_require__(7115);
 exports.API_STATUS_OK = 'OK';
 exports.INSTANCE_STATE_STARTED = 'Started';
@@ -104,7 +263,7 @@ class VM {
                 return response.data.body[0];
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
@@ -129,7 +288,7 @@ class VM {
                 return response.data.body.instance_state;
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
@@ -148,7 +307,7 @@ class VM {
                 return null;
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
@@ -166,26 +325,12 @@ class VM {
                 }
             }
             catch (error) {
-                throw createError(error);
+                throw (0, axiosError_1.createAxiosError)(error);
             }
         });
     }
 }
 exports.VM = VM;
-function createError(error) {
-    if (error instanceof axios.AxiosError && error.response) {
-        if (error.response.status === 400) {
-            throw new Error(`Controller responded with an error: ${JSON.stringify(error.response.data)}`);
-        }
-        else {
-            throw new Error(`HTTP request failed: status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`);
-        }
-    }
-    else if (error instanceof axios.AxiosError && error.request) {
-        throw new Error(`Controller request failed: ${error.cause}`);
-    }
-    throw error;
-}
 
 
 /***/ }),
@@ -298,6 +443,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Runner = void 0;
 const axios = __importStar(__nccwpck_require__(2441));
+const axiosError_1 = __nccwpck_require__(4866);
 const log_1 = __nccwpck_require__(7115);
 const RUNNERS_PER_PAGE = 100;
 class Runner {
@@ -323,7 +469,13 @@ class Runner {
             let collected = 0;
             let totalCount = 0;
             do {
-                const response = yield this.client.get(this.runnersPath(), { params: { per_page: RUNNERS_PER_PAGE, page } });
+                let response;
+                try {
+                    response = yield this.client.get(this.runnersPath(), { params: { per_page: RUNNERS_PER_PAGE, page } });
+                }
+                catch (error) {
+                    throw (0, axiosError_1.createAxiosError)(error);
+                }
                 (0, log_1.logDebug)(`listSelfHostedRunners page ${page}: ${JSON.stringify(response.data)}`);
                 totalCount = response.data.total_count;
                 const { runners } = response.data;
@@ -342,14 +494,24 @@ class Runner {
     }
     createToken() {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.client.post(`${this.runnersPath()}/registration-token`);
-            (0, log_1.logDebug)(`createRegistrationToken: ${JSON.stringify(response.data)}`);
-            return response.data.token;
+            try {
+                const response = yield this.client.post(`${this.runnersPath()}/registration-token`);
+                (0, log_1.logDebug)(`createRegistrationToken: ${JSON.stringify(response.data)}`);
+                return response.data.token;
+            }
+            catch (error) {
+                throw (0, axiosError_1.createAxiosError)(error);
+            }
         });
     }
     delete(runnerId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.client.delete(`${this.runnersPath()}/${runnerId}`);
+            try {
+                yield this.client.delete(`${this.runnersPath()}/${runnerId}`);
+            }
+            catch (error) {
+                throw (0, axiosError_1.createAxiosError)(error);
+            }
         });
     }
 }

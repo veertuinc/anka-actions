@@ -49,6 +49,28 @@ function withServer<T>(
   })
 }
 
+test('create token reports full HTTP details on failure', async () => {
+  await withServer(
+    JSON.stringify({
+      message: 'Resource not accessible by integration'
+    }),
+    403,
+    async runner => {
+      let message = ''
+      try {
+        await runner.createToken()
+      } catch (error) {
+        message = (error as Error).message
+      }
+
+      expect(message).toContain('HTTP request failed:')
+      expect(message).toMatch(/"status": 403/)
+      expect(message).toContain('Resource not accessible by integration')
+      expect(message).toContain('"Authorization": "[REDACTED]"')
+    }
+  )
+})
+
 test('create token', async () => {
   await withServer(
     JSON.stringify({
