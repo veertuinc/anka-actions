@@ -2,9 +2,7 @@
 
 A monorepo of GitHub Actions for orchestrating ephemeral, self-hosted runners on
 [Anka Build Cloud](https://docs.veertu.com/anka/anka-build-cloud/). Each action lives in
-its own subfolder and is referenced by its path, the same way
-[`github/codeql-action`](https://github.com/github/codeql-action) ships multiple actions
-from a single repository.
+its own subfolder and is referenced by its path.
 
 ## Actions in this repository
 
