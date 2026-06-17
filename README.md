@@ -12,7 +12,6 @@ from a single repository.
 | --- | --- | --- |
 | [Anka Actions - Up](up/README.md) | `veertuinc/anka-actions/up@v1` | Spins up a new Anka VM instance and registers a self-hosted runner. |
 | [Anka Actions - Down](down/README.md) | `veertuinc/anka-actions/down@v1` | Tears down the Anka VM instance and removes the runner. |
-| [anka-actions-common](common/README.md) | _(library, not an action)_ | Shared TypeScript library consumed by `up` and `down`. |
 
 ## Usage
 
