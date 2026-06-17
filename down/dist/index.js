@@ -388,8 +388,8 @@ const dateTimeDecorator = (m) => `[${new Date().toLocaleString()}] ${m}`;
 exports.logDebug = logDecorator(core.debug, dateTimeDecorator);
 exports.logInfo = logDecorator(core.info, dateTimeDecorator);
 exports.logError = logDecorator(core.error, dateTimeDecorator);
-// White background + dark foreground reads well in GitHub Actions' dark log UI.
-const HIGHLIGHT_LABEL = '\u001b[47;30m';
+// Foreground-only styling avoids dark background blocks in GitHub Actions logs.
+const HIGHLIGHT_LABEL = '\u001b[1m';
 const HIGHLIGHT_VALUE = '\u001b[1;34m';
 const HIGHLIGHT_RESET = '\u001b[0m';
 function logHighlight(label, value) {

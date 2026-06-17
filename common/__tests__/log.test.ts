@@ -31,8 +31,8 @@ test('can log error', async () => {
   expect(spyError).toHaveBeenCalledWith('[1/1/2020, 12:00:00 AM] message')
 })
 
-test('logHighlight uses a light background with dark text', () => {
+test('logHighlight uses bold foreground styling without a background', () => {
   expect(logHighlight('External ID', 'abc-123')).toBe(
-    '\u001b[47;30m External ID \u001b[1;34mabc-123\u001b[0m'
+    '\u001b[1m External ID \u001b[1;34mabc-123\u001b[0m'
   )
 })
