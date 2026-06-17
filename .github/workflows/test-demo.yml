@@ -11,7 +11,7 @@ jobs:
   action-up:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - uses: ./up
         id: action-up
         with:
@@ -39,7 +39,7 @@ jobs:
     needs: [ action-up, inside_vm_job ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - uses: ./down
         with:
           action-id: ${{ needs.action-up.outputs.action-id }}
