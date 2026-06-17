@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {logDebug, logInfo, Runner, VM} from 'anka-actions-common'
+import {logDebug, logInfo, logHighlight, Runner, VM} from 'anka-actions-common'
 
 type ActionParams = {
   ghOwner: string
@@ -35,7 +35,7 @@ export async function doAction(
   const runnerId = await runner.getRunnerByName(params.actionId)
   if (runnerId !== null) {
     logInfo(
-      `[Action Runner] deleting runner with \u001b[40;1m id \u001b[33m${runnerId} \u001b[0m / \u001b[40;1m name \u001b[33m${params.actionId}`
+      `[Action Runner] deleting runner with ${logHighlight('id', runnerId)} / ${logHighlight('name', params.actionId)}`
     )
     await runner.delete(runnerId)
   } else {
@@ -45,7 +45,7 @@ export async function doAction(
   const instanceId = await vm.getInstanceId(params.actionId)
   if (instanceId !== null) {
     logInfo(
-      `[VM] terminating instance with \u001b[40;1m id \u001b[33m${instanceId} \u001b[0m / \u001b[40;1m External ID \u001b[33m${params.actionId}`
+      `[VM] terminating instance with ${logHighlight('id', instanceId)} / ${logHighlight('External ID', params.actionId)}`
     )
     await vm.terminate(instanceId)
   } else {

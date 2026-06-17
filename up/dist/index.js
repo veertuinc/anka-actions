@@ -364,13 +364,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logError = exports.logInfo = exports.logDebug = void 0;
+exports.logHighlight = exports.logError = exports.logInfo = exports.logDebug = void 0;
 const core = __importStar(__nccwpck_require__(5316));
 const logDecorator = (logFn, decFn) => (message) => logFn(decFn(message));
 const dateTimeDecorator = (m) => `[${new Date().toLocaleString()}] ${m}`;
 exports.logDebug = logDecorator(core.debug, dateTimeDecorator);
 exports.logInfo = logDecorator(core.info, dateTimeDecorator);
 exports.logError = logDecorator(core.error, dateTimeDecorator);
+// White background + dark foreground reads well in GitHub Actions' dark log UI.
+const HIGHLIGHT_LABEL = '\u001b[47;30m';
+const HIGHLIGHT_VALUE = '\u001b[1;34m';
+const HIGHLIGHT_RESET = '\u001b[0m';
+function logHighlight(label, value) {
+    return `${HIGHLIGHT_LABEL} ${label} ${HIGHLIGHT_VALUE}${value}${HIGHLIGHT_RESET}`;
+}
+exports.logHighlight = logHighlight;
 
 
 /***/ }),
@@ -36819,7 +36827,7 @@ function doAction(actionId, runner, vm, params) {
             script_fail_handler: 1,
             external_id: actionId
         };
-        (0, anka_actions_common_1.logInfo)(`[VM] starting new instance with \u001b[40;1m External ID \u001b[33m${actionId} \u001b[0m`);
+        (0, anka_actions_common_1.logInfo)(`[VM] starting new instance with ${(0, anka_actions_common_1.logHighlight)('External ID', actionId)}`);
         const instanceId = yield vm.start(actionId, repoUrl, token, params.templateRunnerDir, vmConfig);
         core.setOutput('action-id', actionId);
         let vmState;
@@ -36840,7 +36848,7 @@ function doAction(actionId, runner, vm, params) {
                 yield (0, anka_actions_common_1.sleep)(params.pollDelay * 1000);
             }
             else {
-                (0, anka_actions_common_1.logInfo)(`[Action Runner] with \u001b[40;1m name \u001b[33m${actionId} \u001b[0m and \u001b[40;1m id \u001b[33m${runnerId} \u001b[0m has been registered`);
+                (0, anka_actions_common_1.logInfo)(`[Action Runner] with ${(0, anka_actions_common_1.logHighlight)('name', actionId)} and ${(0, anka_actions_common_1.logHighlight)('id', runnerId)} has been registered`);
             }
         } while (runnerId === null);
     });

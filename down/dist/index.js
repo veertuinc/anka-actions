@@ -364,13 +364,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logError = exports.logInfo = exports.logDebug = void 0;
+exports.logHighlight = exports.logError = exports.logInfo = exports.logDebug = void 0;
 const core = __importStar(__nccwpck_require__(5316));
 const logDecorator = (logFn, decFn) => (message) => logFn(decFn(message));
 const dateTimeDecorator = (m) => `[${new Date().toLocaleString()}] ${m}`;
 exports.logDebug = logDecorator(core.debug, dateTimeDecorator);
 exports.logInfo = logDecorator(core.info, dateTimeDecorator);
 exports.logError = logDecorator(core.error, dateTimeDecorator);
+// White background + dark foreground reads well in GitHub Actions' dark log UI.
+const HIGHLIGHT_LABEL = '\u001b[47;30m';
+const HIGHLIGHT_VALUE = '\u001b[1;34m';
+const HIGHLIGHT_RESET = '\u001b[0m';
+function logHighlight(label, value) {
+    return `${HIGHLIGHT_LABEL} ${label} ${HIGHLIGHT_VALUE}${value}${HIGHLIGHT_RESET}`;
+}
+exports.logHighlight = logHighlight;
 
 
 /***/ }),
@@ -600,7 +608,7 @@ function doAction(runner, vm, params) {
     return __awaiter(this, void 0, void 0, function* () {
         const runnerId = yield runner.getRunnerByName(params.actionId);
         if (runnerId !== null) {
-            (0, anka_actions_common_1.logInfo)(`[Action Runner] deleting runner with \u001b[40;1m id \u001b[33m${runnerId} \u001b[0m / \u001b[40;1m name \u001b[33m${params.actionId}`);
+            (0, anka_actions_common_1.logInfo)(`[Action Runner] deleting runner with ${(0, anka_actions_common_1.logHighlight)('id', runnerId)} / ${(0, anka_actions_common_1.logHighlight)('name', params.actionId)}`);
             yield runner.delete(runnerId);
         }
         else {
@@ -608,7 +616,7 @@ function doAction(runner, vm, params) {
         }
         const instanceId = yield vm.getInstanceId(params.actionId);
         if (instanceId !== null) {
-            (0, anka_actions_common_1.logInfo)(`[VM] terminating instance with \u001b[40;1m id \u001b[33m${instanceId} \u001b[0m / \u001b[40;1m External ID \u001b[33m${params.actionId}`);
+            (0, anka_actions_common_1.logInfo)(`[VM] terminating instance with ${(0, anka_actions_common_1.logHighlight)('id', instanceId)} / ${(0, anka_actions_common_1.logHighlight)('External ID', params.actionId)}`);
             yield vm.terminate(instanceId);
         }
         else {

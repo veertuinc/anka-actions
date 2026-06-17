@@ -4,7 +4,7 @@ const spyInfo = jest.spyOn(core, 'info')
 const spyError = jest.spyOn(core, 'error')
 
 import {expect, test} from '@jest/globals'
-import {logDebug, logError, logInfo} from '../lib/log'
+import {logDebug, logError, logInfo, logHighlight} from '../lib/log'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -29,4 +29,10 @@ test('can log info', async () => {
 test('can log error', async () => {
   logError('message')
   expect(spyError).toHaveBeenCalledWith('[1/1/2020, 12:00:00 AM] message')
+})
+
+test('logHighlight uses a light background with dark text', () => {
+  expect(logHighlight('External ID', 'abc-123')).toBe(
+    '\u001b[47;30m External ID \u001b[1;34mabc-123\u001b[0m'
+  )
 })

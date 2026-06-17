@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {
   logDebug,
   logInfo,
+  logHighlight,
   sleep,
   Runner,
   VM,
@@ -76,9 +77,7 @@ export async function doAction(
     external_id: actionId
   }
 
-  logInfo(
-    `[VM] starting new instance with \u001b[40;1m External ID \u001b[33m${actionId} \u001b[0m`
-  )
+  logInfo(`[VM] starting new instance with ${logHighlight('External ID', actionId)}`)
   const instanceId = await vm.start(
     actionId,
     repoUrl,
@@ -108,7 +107,7 @@ export async function doAction(
       await sleep(params.pollDelay * 1000)
     } else {
       logInfo(
-        `[Action Runner] with \u001b[40;1m name \u001b[33m${actionId} \u001b[0m and \u001b[40;1m id \u001b[33m${runnerId} \u001b[0m has been registered`
+        `[Action Runner] with ${logHighlight('name', actionId)} and ${logHighlight('id', runnerId)} has been registered`
       )
     }
   } while (runnerId === null)

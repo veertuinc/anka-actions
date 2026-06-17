@@ -23,10 +23,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logError = exports.logInfo = exports.logDebug = void 0;
+exports.logHighlight = exports.logError = exports.logInfo = exports.logDebug = void 0;
 const core = __importStar(require("@actions/core"));
 const logDecorator = (logFn, decFn) => (message) => logFn(decFn(message));
 const dateTimeDecorator = (m) => `[${new Date().toLocaleString()}] ${m}`;
 exports.logDebug = logDecorator(core.debug, dateTimeDecorator);
 exports.logInfo = logDecorator(core.info, dateTimeDecorator);
 exports.logError = logDecorator(core.error, dateTimeDecorator);
+// White background + dark foreground reads well in GitHub Actions' dark log UI.
+const HIGHLIGHT_LABEL = '\u001b[47;30m';
+const HIGHLIGHT_VALUE = '\u001b[1;34m';
+const HIGHLIGHT_RESET = '\u001b[0m';
+function logHighlight(label, value) {
+    return `${HIGHLIGHT_LABEL} ${label} ${HIGHLIGHT_VALUE}${value}${HIGHLIGHT_RESET}`;
+}
+exports.logHighlight = logHighlight;
