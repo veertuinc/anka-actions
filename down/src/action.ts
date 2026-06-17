@@ -35,7 +35,10 @@ export async function doAction(
   const runnerId = await runner.getRunnerByName(params.actionId)
   if (runnerId !== null) {
     logInfo(
-      `[Action Runner] deleting runner with ${logHighlight('id', runnerId)} / ${logHighlight('name', params.actionId)}`
+      `[Action Runner] deleting runner with ${logHighlight(
+        'id',
+        runnerId
+      )} / ${logHighlight('name', params.actionId)}`
     )
     await runner.delete(runnerId)
   } else {
@@ -45,7 +48,10 @@ export async function doAction(
   const instanceId = await vm.getInstanceId(params.actionId)
   if (instanceId !== null) {
     logInfo(
-      `[VM] terminating instance with ${logHighlight('id', instanceId)} / ${logHighlight('External ID', params.actionId)}`
+      `[VM] terminating instance with ${logHighlight(
+        'id',
+        instanceId
+      )} / ${logHighlight('External ID', params.actionId)}`
     )
     await vm.terminate(instanceId)
   } else {

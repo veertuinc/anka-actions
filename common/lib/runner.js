@@ -34,7 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Runner = void 0;
 const axios = __importStar(require("axios"));
-const axiosError_1 = require("./axiosError");
+const axios_error_1 = require("./axios-error");
 const log_1 = require("./log");
 const RUNNERS_PER_PAGE = 100;
 class Runner {
@@ -65,7 +65,7 @@ class Runner {
                     response = yield this.client.get(this.runnersPath(), { params: { per_page: RUNNERS_PER_PAGE, page } });
                 }
                 catch (error) {
-                    throw (0, axiosError_1.createAxiosError)(error);
+                    throw (0, axios_error_1.createAxiosError)(error);
                 }
                 (0, log_1.logDebug)(`listSelfHostedRunners page ${page}: ${JSON.stringify(response.data)}`);
                 totalCount = response.data.total_count;
@@ -91,7 +91,7 @@ class Runner {
                 return response.data.token;
             }
             catch (error) {
-                throw (0, axiosError_1.createAxiosError)(error);
+                throw (0, axios_error_1.createAxiosError)(error);
             }
         });
     }
@@ -101,7 +101,7 @@ class Runner {
                 yield this.client.delete(`${this.runnersPath()}/${runnerId}`);
             }
             catch (error) {
-                throw (0, axiosError_1.createAxiosError)(error);
+                throw (0, axios_error_1.createAxiosError)(error);
             }
         });
     }

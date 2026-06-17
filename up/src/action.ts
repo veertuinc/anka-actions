@@ -78,7 +78,9 @@ export async function doAction(
     external_id: actionId
   }
 
-  logInfo(`[VM] starting new instance with ${logHighlight('External ID', actionId)}`)
+  logInfo(
+    `[VM] starting new instance with ${logHighlight('External ID', actionId)}`
+  )
   const instanceId = await vm.start(
     actionId,
     repoUrl,
@@ -89,22 +91,20 @@ export async function doAction(
 
   core.setOutput('action-id', actionId)
 
-  let vmState
+  let vmState = ''
   logInfo(`[VM] waiting for the VM instance to start...`)
-  while (true) {
+  do {
     const vmStatus = await vm.getState(instanceId)
     vmState = vmStatus.instanceState
     const progressSuffix =
-      vmState === INSTANCE_STATE_PULLING &&
-      vmStatus.progress !== undefined
+      vmState === INSTANCE_STATE_PULLING && vmStatus.progress !== undefined
         ? ` (${Math.round(vmStatus.progress * 100)}%)`
         : ''
     logInfo(`[VM] state: ${vmState}${progressSuffix}`)
-    if (vmState === INSTANCE_STATE_STARTED) {
-      break
+    if (vmState !== INSTANCE_STATE_STARTED) {
+      await sleep(params.pollDelay * 1000)
     }
-    await sleep(params.pollDelay * 1000)
-  }
+  } while (vmState !== INSTANCE_STATE_STARTED)
 
   let runnerId: number | null = null
   logInfo(`[Action Runner] waiting for the Github action runner to register...`)
@@ -115,7 +115,10 @@ export async function doAction(
       await sleep(params.pollDelay * 1000)
     } else {
       logInfo(
-        `[Action Runner] with ${logHighlight('name', actionId)} and ${logHighlight('id', runnerId)} has been registered`
+        `[Action Runner] with ${logHighlight(
+          'name',
+          actionId
+        )} and ${logHighlight('id', runnerId)} has been registered`
       )
     }
   } while (runnerId === null)

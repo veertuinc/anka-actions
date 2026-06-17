@@ -1,6 +1,6 @@
 import * as axios from 'axios'
 import https from 'https'
-import {createAxiosError} from './axiosError'
+import {createAxiosError} from './axios-error'
 import {logDebug} from './log'
 
 export const API_STATUS_OK = 'OK'
@@ -241,7 +241,9 @@ export class VM {
         )
       }
 
-      if (INSTANCE_STARTUP_FAILURE_STATES.has(response.data.body.instance_state)) {
+      if (
+        INSTANCE_STARTUP_FAILURE_STATES.has(response.data.body.instance_state)
+      ) {
         throw new Error(formatInstanceStartupFailure(response.data.body))
       }
 

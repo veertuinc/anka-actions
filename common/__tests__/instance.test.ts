@@ -183,7 +183,9 @@ test('get VM state terminated fails', async () => {
     res.setHeader('Connection', 'close')
     res.end(
       Buffer.from(
-        fs.readFileSync('__tests__/fixtures/list-vm-single-state-terminated.json')
+        fs.readFileSync(
+          '__tests__/fixtures/list-vm-single-state-terminated.json'
+        )
       )
     )
   })

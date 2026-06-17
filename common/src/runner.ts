@@ -1,5 +1,5 @@
 import * as axios from 'axios'
-import {createAxiosError} from './axiosError'
+import {createAxiosError} from './axios-error'
 import {logDebug} from './log'
 
 interface GitHubRunner {

@@ -1,5 +1,5 @@
 import * as axios from 'axios'
-import {createAxiosError} from '../src/axiosError'
+import {createAxiosError} from '../src/axios-error'
 import {expect, test} from '@jest/globals'
 
 test('formats axios response errors with redacted secrets', () => {
@@ -24,7 +24,8 @@ test('formats axios response errors with redacted secrets', () => {
       headers: {'content-type': 'application/json'},
       data: {
         message: 'Resource not accessible by integration',
-        documentation_url: 'https://docs.github.com/rest/actions/self-hosted-runners'
+        documentation_url:
+          'https://docs.github.com/rest/actions/self-hosted-runners'
       },
       config: {} as axios.InternalAxiosRequestConfig,
       request: {}
@@ -64,6 +65,8 @@ test('formats axios errors without a response', () => {
 
   expect(formatted.message).toContain('HTTP request failed (no response):')
   expect(formatted.message).toContain('"method": "GET"')
-  expect(formatted.message).toContain('"url": "https://controller.example.com/api/v1/vm"')
+  expect(formatted.message).toContain(
+    '"url": "https://controller.example.com/api/v1/vm"'
+  )
   expect(formatted.message).not.toContain('secret-value')
 })

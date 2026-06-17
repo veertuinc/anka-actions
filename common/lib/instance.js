@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VM = exports.INSTANCE_STATE_TERMINATED = exports.INSTANCE_STATE_TERMINATING = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_PULLING = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
 const axios = __importStar(require("axios"));
 const https_1 = __importDefault(require("https"));
-const axiosError_1 = require("./axiosError");
+const axios_error_1 = require("./axios-error");
 const log_1 = require("./log");
 exports.API_STATUS_OK = 'OK';
 exports.INSTANCE_STATE_STARTED = 'Started';
@@ -118,7 +118,7 @@ class VM {
                 return response.data.body[0];
             }
             catch (error) {
-                throw (0, axiosError_1.createAxiosError)(error);
+                throw (0, axios_error_1.createAxiosError)(error);
             }
         });
     }
@@ -140,7 +140,7 @@ class VM {
                 return Object.assign({ instanceState }, (progress !== undefined ? { progress } : {}));
             }
             catch (error) {
-                throw (0, axiosError_1.createAxiosError)(error);
+                throw (0, axios_error_1.createAxiosError)(error);
             }
         });
     }
@@ -159,7 +159,7 @@ class VM {
                 return null;
             }
             catch (error) {
-                throw (0, axiosError_1.createAxiosError)(error);
+                throw (0, axios_error_1.createAxiosError)(error);
             }
         });
     }
@@ -177,7 +177,7 @@ class VM {
                 }
             }
             catch (error) {
-                throw (0, axiosError_1.createAxiosError)(error);
+                throw (0, axios_error_1.createAxiosError)(error);
             }
         });
     }

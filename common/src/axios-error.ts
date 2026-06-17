@@ -58,10 +58,12 @@ function redactValue(value: unknown): unknown {
 
   if (typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, fieldValue]) => [
-        key,
-        redactFieldName(key) ? REDACTED : redactValue(fieldValue)
-      ])
+      Object.entries(value as Record<string, unknown>).map(
+        ([key, fieldValue]) => [
+          key,
+          redactFieldName(key) ? REDACTED : redactValue(fieldValue)
+        ]
+      )
     )
   }
 
@@ -118,7 +120,9 @@ function formatRequest(
   return request
 }
 
-function formatResponse(response: axios.AxiosResponse): Record<string, unknown> {
+function formatResponse(
+  response: axios.AxiosResponse
+): Record<string, unknown> {
   return {
     status: response.status,
     statusText: response.statusText,
