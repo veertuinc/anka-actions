@@ -7,6 +7,14 @@ export const API_STATUS_OK = 'OK'
 export const INSTANCE_STATE_STARTED = 'Started'
 export const INSTANCE_STATE_PULLING = 'Pulling'
 export const INSTANCE_STATE_ERROR = 'Error'
+export const INSTANCE_STATE_TERMINATING = 'Terminating'
+export const INSTANCE_STATE_TERMINATED = 'Terminated'
+
+const INSTANCE_STARTUP_FAILURE_STATES = new Set([
+  INSTANCE_STATE_ERROR,
+  INSTANCE_STATE_TERMINATING,
+  INSTANCE_STATE_TERMINATED
+])
 
 export type InstanceStatus = {
   instanceState: string
@@ -82,6 +90,21 @@ interface Instance {
     stdout: string
     stderr: string
   }
+}
+
+function formatInstanceStartupFailure(instance: Instance): string {
+  if (instance.instance_state === INSTANCE_STATE_ERROR) {
+    let errorMsg = `VM failed to start: ${instance.message ?? 'unknown error'}`
+
+    if (instance.startup_script) {
+      errorMsg = `${errorMsg}: ${instance.startup_script.stderr}`
+    }
+
+    return errorMsg.trim()
+  }
+
+  const detail = instance.message ? `: ${instance.message}` : ''
+  return `VM failed to start: instance entered ${instance.instance_state} state${detail}`.trim()
 }
 
 export interface TerminateVMResponse {
@@ -218,14 +241,8 @@ export class VM {
         )
       }
 
-      if (response.data.body.instance_state === INSTANCE_STATE_ERROR) {
-        let errorMsg = `VM failed to start: ${response.data.body.message}`
-
-        if (response.data.body.startup_script) {
-          errorMsg = `${errorMsg}: ${response.data.body.startup_script.stderr}`
-        }
-
-        throw new Error(errorMsg.trim())
+      if (INSTANCE_STARTUP_FAILURE_STATES.has(response.data.body.instance_state)) {
+        throw new Error(formatInstanceStartupFailure(response.data.body))
       }
 
       const {instance_state: instanceState, progress} = response.data.body

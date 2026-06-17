@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VM = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_PULLING = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
+exports.VM = exports.INSTANCE_STATE_TERMINATED = exports.INSTANCE_STATE_TERMINATING = exports.INSTANCE_STATE_ERROR = exports.INSTANCE_STATE_PULLING = exports.INSTANCE_STATE_STARTED = exports.API_STATUS_OK = void 0;
 const axios = __importStar(require("axios"));
 const https_1 = __importDefault(require("https"));
 const axiosError_1 = require("./axiosError");
@@ -44,6 +44,25 @@ exports.API_STATUS_OK = 'OK';
 exports.INSTANCE_STATE_STARTED = 'Started';
 exports.INSTANCE_STATE_PULLING = 'Pulling';
 exports.INSTANCE_STATE_ERROR = 'Error';
+exports.INSTANCE_STATE_TERMINATING = 'Terminating';
+exports.INSTANCE_STATE_TERMINATED = 'Terminated';
+const INSTANCE_STARTUP_FAILURE_STATES = new Set([
+    exports.INSTANCE_STATE_ERROR,
+    exports.INSTANCE_STATE_TERMINATING,
+    exports.INSTANCE_STATE_TERMINATED
+]);
+function formatInstanceStartupFailure(instance) {
+    var _a;
+    if (instance.instance_state === exports.INSTANCE_STATE_ERROR) {
+        let errorMsg = `VM failed to start: ${(_a = instance.message) !== null && _a !== void 0 ? _a : 'unknown error'}`;
+        if (instance.startup_script) {
+            errorMsg = `${errorMsg}: ${instance.startup_script.stderr}`;
+        }
+        return errorMsg.trim();
+    }
+    const detail = instance.message ? `: ${instance.message}` : '';
+    return `VM failed to start: instance entered ${instance.instance_state} state${detail}`.trim();
+}
 class VM {
     constructor(baseURL, rootToken, httpsAgentCa, httpsAgentCert, httpsAgentKey, httpsAgentPassphrase, httpsAgentSkipCertVerify) {
         const config = { baseURL };
@@ -114,12 +133,8 @@ class VM {
                 if (!response.data.body.instance_state) {
                     throw new Error(`API response body: ${JSON.stringify(response.data.body)}`);
                 }
-                if (response.data.body.instance_state === exports.INSTANCE_STATE_ERROR) {
-                    let errorMsg = `VM failed to start: ${response.data.body.message}`;
-                    if (response.data.body.startup_script) {
-                        errorMsg = `${errorMsg}: ${response.data.body.startup_script.stderr}`;
-                    }
-                    throw new Error(errorMsg.trim());
+                if (INSTANCE_STARTUP_FAILURE_STATES.has(response.data.body.instance_state)) {
+                    throw new Error(formatInstanceStartupFailure(response.data.body));
                 }
                 const { instance_state: instanceState, progress } = response.data.body;
                 return Object.assign({ instanceState }, (progress !== undefined ? { progress } : {}));

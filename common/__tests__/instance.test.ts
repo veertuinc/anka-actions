@@ -177,6 +177,38 @@ test('get VM state pulling includes progress', async () => {
   })
 })
 
+test('get VM state terminated fails', async () => {
+  const server = http.createServer(function (req, res) {
+    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Connection', 'close')
+    res.end(
+      Buffer.from(
+        fs.readFileSync('__tests__/fixtures/list-vm-single-state-terminated.json')
+      )
+    )
+  })
+
+  return new Promise((resolve, reject) => {
+    server.listen(4444, () => {
+      const vm = new VM('http://127.0.0.1:4444')
+      expect(vm.getState('vmid'))
+        .rejects.toThrowError(
+          new Error(
+            'VM failed to start: instance entered Terminated state: instance terminated by controller'
+          )
+        )
+        .then(result => {
+          server.close()
+          resolve(result)
+        })
+        .catch(reason => {
+          server.close()
+          reject(reason)
+        })
+    })
+  })
+})
+
 test('get VM state error', async () => {
   const server = http.createServer(function (req, res) {
     const chunks: Array<Uint8Array> = []

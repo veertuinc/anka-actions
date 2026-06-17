@@ -91,19 +91,20 @@ export async function doAction(
 
   let vmState
   logInfo(`[VM] waiting for the VM instance to start...`)
-  do {
+  while (true) {
     const vmStatus = await vm.getState(instanceId)
     vmState = vmStatus.instanceState
-    if (vmState !== INSTANCE_STATE_STARTED) {
-      await sleep(params.pollDelay * 1000)
-    }
     const progressSuffix =
       vmState === INSTANCE_STATE_PULLING &&
       vmStatus.progress !== undefined
         ? ` (${Math.round(vmStatus.progress * 100)}%)`
         : ''
     logInfo(`[VM] state: ${vmState}${progressSuffix}`)
-  } while (vmState !== INSTANCE_STATE_STARTED)
+    if (vmState === INSTANCE_STATE_STARTED) {
+      break
+    }
+    await sleep(params.pollDelay * 1000)
+  }
 
   let runnerId: number | null = null
   logInfo(`[Action Runner] waiting for the Github action runner to register...`)

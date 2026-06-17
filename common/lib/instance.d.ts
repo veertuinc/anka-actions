@@ -2,6 +2,8 @@ export declare const API_STATUS_OK = "OK";
 export declare const INSTANCE_STATE_STARTED = "Started";
 export declare const INSTANCE_STATE_PULLING = "Pulling";
 export declare const INSTANCE_STATE_ERROR = "Error";
+export declare const INSTANCE_STATE_TERMINATING = "Terminating";
+export declare const INSTANCE_STATE_TERMINATED = "Terminated";
 export type InstanceStatus = {
     instanceState: string;
     progress?: number;
