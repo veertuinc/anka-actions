@@ -6,16 +6,18 @@ This action is mean to be used with [anka-actions-down](https://github.com/veert
 
 1. Install the github runner inside of your VM. This can be done with [our installation script](https://github.com/veertuinc/getting-started/blob/master/GITHUB_ACTIONS/install.sh).
 
-2. Create a GitHub [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and add it as a repository secret under https://github.com/{USER/ORG}/{REPONAME}/settings/secrets/actions. The token owner must be an **Admin** collaborator on the repository.
+2. Create a GitHub [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and add it as a repository secret. The token **owner** must be a repository **Admin** — permissions on the token cannot exceed the account's role.
 
-   - **Classic PAT:** grant the **`repo`** scope.
-   - **Fine-grained PAT:** grant **Administration** repository permission set to **Read and write**, scoped to the repository where runners are registered.
+   - **Classic PAT:** `repo` scope
+   - **Fine-grained PAT:** resource owner = org/user that owns the repo; **Administration: Read and write** on the target repo
+
+   **`403 Resource not accessible by personal access token`?** Administration on the token is not enough. Also check: token owner is repo Admin; [org PAT settings](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization) allow fine-grained PATs, token is approved, and SAML SSO is authorized. Use a classic PAT with `repo` if fine-grained tokens are blocked.
 
 ### Inputs
 
 | input name                          | required? | description                                                                                                                     |
 |-------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `gh-pat`                            | **yes** | GitHub personal access token used to register and remove self-hosted runners. **Classic PAT:** `repo` scope. **Fine-grained PAT:** Repository **Administration** (Read and write). Token owner must be a repository admin. |
+| `gh-pat`                            | **yes** | GitHub PAT used to register and remove self-hosted runners. Token owner must be a repository **Admin**. **Classic:** `repo` scope. **Fine-grained:** **Administration** (Read and write). |
 | `controller-url`                    | **yes** | The Anka Build Cloud Controller's URL to communicate with.                                                                       |
 | `template-id`                       | **yes** | UUID of the Anka VM Template in the Anka Build Cloud Registry.                                                                  |
 | `template-tag`                      | no | Anka VM Template's Tag.                                                                                                          |
