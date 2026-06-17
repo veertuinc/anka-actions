@@ -1,0 +1,31 @@
+{
+  "name": "anka-actions",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Monorepo of Anka Build Cloud GitHub Actions (up, down) and their shared library (common)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/veertuinc/anka-actions.git"
+  },
+  "author": "Veertu Inc.",
+  "license": "MIT",
+  "workspaces": [
+    "common",
+    "up",
+    "down"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "package": "npm run package --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "all": "npm run all --workspaces --if-present"
+  },
+  "comments": {
+    "overrides": "Security pins for transitive deps that have no patched release in the range our direct deps request. undici: only reached via @actions/core's unused OIDC client, pinned above the <=6.23.0 advisories. js-yaml: forces the 3.x used by jest's istanbul tooling up to a patched 4.x (load-nyc-config uses .load(), which exists in v4)."
+  },
+  "overrides": {
+    "undici": "^6.24.0",
+    "js-yaml": "^4.2.0"
+  }
+}
