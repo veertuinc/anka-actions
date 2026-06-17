@@ -11,7 +11,7 @@ name: Check dist/
 on:
   push:
     branches:
-      - main
+      - edge
     paths-ignore:
       - '**.md'
   pull_request:
