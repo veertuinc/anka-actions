@@ -6,11 +6,16 @@ This action is mean to be used with [anka-actions-up](https://github.com/veertui
 
 1. [anka-actions-up](https://github.com/veertuinc/anka-actions-up) has started a VM and returned the `action-id` output.
 
+2. Provide the same GitHub [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) used by `anka-actions-up`. The token owner must be an **Admin** collaborator on the repository.
+
+   - **Classic PAT:** grant the **`repo`** scope.
+   - **Fine-grained PAT:** grant **Administration** repository permission set to **Read and write**, scoped to the repository where runners are registered.
+
 ## Inputs
 
 | input name                          | required? | description                                                                                                                     |
 |-------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `gh-pat`                            | **yes** | Github personal access token (requires `repo` scope in order to be able to create/remove self-hosted runners in the repository) |
+| `gh-pat`                            | **yes** | GitHub personal access token used to register and remove self-hosted runners. **Classic PAT:** `repo` scope. **Fine-grained PAT:** Repository **Administration** (Read and write). Token owner must be a repository admin. |
 | `controller-url`                    | **yes** | The Anka Build Cloud Controller's URL to communicate with                                                                       |
 | `action-id`                         | **yes** | The action id received in the output of `anka-actions-up`                                                                       |
 | `gh-owner`                          | no | GitHub repository owner                                                                                                         |

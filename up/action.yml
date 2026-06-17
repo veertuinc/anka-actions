@@ -19,7 +19,7 @@ inputs:
     required: false
     default: 'https://api.github.com'
   gh-pat:
-    description: 'GitHub personal access token (requires "repo" scope access)'
+    description: 'GitHub personal access token. Classic PAT: repo scope. Fine-grained PAT: Repository Administration (Read and write). Token owner must be a repository admin.'
     required: true
 
   # Template

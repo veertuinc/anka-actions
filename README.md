@@ -113,3 +113,8 @@ source produces — so always re-run the commands above and commit the regenerat
 ## License
 
 [MIT](up/LICENSE)
+
+
+## TODO
+
+- [ ] Rewrite with ESM instead of CommonJS

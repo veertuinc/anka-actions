@@ -6,13 +6,16 @@ This action is mean to be used with [anka-actions-down](https://github.com/veert
 
 1. Install the github runner inside of your VM. This can be done with [our installation script](https://github.com/veertuinc/getting-started/blob/master/GITHUB_ACTIONS/install.sh).
 
-2. Add your Github [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and add it to your repo under https://github.com/{USER/ORG}/{REPONAME}/settings/secrets/actions. Your PAT should have "repo" if using classic tokens. Also, the user with the PAT must be added as an Admin collaborator to the repository. Fine-grained are not supported at the time of writing this.
+2. Create a GitHub [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and add it as a repository secret under https://github.com/{USER/ORG}/{REPONAME}/settings/secrets/actions. The token owner must be an **Admin** collaborator on the repository.
+
+   - **Classic PAT:** grant the **`repo`** scope.
+   - **Fine-grained PAT:** grant **Administration** repository permission set to **Read and write**, scoped to the repository where runners are registered.
 
 ### Inputs
 
 | input name                          | required? | description                                                                                                                     |
 |-------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `gh-pat`                            | **yes** | Github personal access token (requires `repo` scope in order to be able to create/remove self-hosted runners in the repository). |
+| `gh-pat`                            | **yes** | GitHub personal access token used to register and remove self-hosted runners. **Classic PAT:** `repo` scope. **Fine-grained PAT:** Repository **Administration** (Read and write). Token owner must be a repository admin. |
 | `controller-url`                    | **yes** | The Anka Build Cloud Controller's URL to communicate with.                                                                       |
 | `template-id`                       | **yes** | UUID of the Anka VM Template in the Anka Build Cloud Registry.                                                                  |
 | `template-tag`                      | no | Anka VM Template's Tag.                                                                                                          |
