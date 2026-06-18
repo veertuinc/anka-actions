@@ -11,19 +11,24 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
-test('getRunnerRegistrationUrl uses org/owner web URL for github.com', () => {
+test('getRunnerRegistrationUrl uses repository web URL for github.com', () => {
   expect(
-    getRunnerRegistrationUrl('https://api.github.com', 'veertuinc')
-  ).toEqual('https://github.com/veertuinc')
+    getRunnerRegistrationUrl(
+      'https://api.github.com',
+      'veertuinc',
+      'anka-actions'
+    )
+  ).toEqual('https://github.com/veertuinc/anka-actions')
 })
 
-test('getRunnerRegistrationUrl uses org/owner web URL for GitHub Enterprise', () => {
+test('getRunnerRegistrationUrl uses repository web URL for GitHub Enterprise', () => {
   expect(
     getRunnerRegistrationUrl(
       'https://github.example.com/api/v3',
-      'my-org'
+      'my-org',
+      'my-repo'
     )
-  ).toEqual('https://github.example.com/my-org')
+  ).toEqual('https://github.example.com/my-org/my-repo')
 })
 
 test('parse all parameters', async () => {

@@ -40,17 +40,17 @@ export type ActionParams = {
   node_id?: string
 }
 
-// GitHub expects the org/owner web URL for config.sh, not owner/repo.
-// See: POST /repos/{owner}/{repo}/actions/runners/registration-token
+// Repo-scoped registration tokens require the repository web URL in config.sh.
 export function getRunnerRegistrationUrl(
   ghBaseUrl: string,
-  ghOwner: string
+  ghOwner: string,
+  ghRepo: string
 ): string {
   let webBaseUrl = ghBaseUrl.split('/api')[0]
   if (ghBaseUrl.match(/api\.github\.com/)) {
     webBaseUrl = 'https://github.com'
   }
-  return `${webBaseUrl}/${ghOwner}`
+  return `${webBaseUrl}/${ghOwner}/${ghRepo}`
 }
 
 export async function doAction(
@@ -63,7 +63,8 @@ export async function doAction(
 
   const registrationUrl = getRunnerRegistrationUrl(
     params.ghBaseUrl,
-    params.ghOwner
+    params.ghOwner,
+    params.ghRepo
   )
 
   const vmConfig: StartVMRequest = {
@@ -77,7 +78,7 @@ export async function doAction(
     startup_script: Buffer.from(
       `set -exo pipefail; \
       cd ${params.templateRunnerDir}; \
-      ./config.sh --url "${registrationUrl}" --token "${token}" --labels "${actionId}" --runnergroup "Default" --name "${actionId}" --work "_work"; \
+      ./config.sh --url "${registrationUrl}" --token "${token}" --labels "${actionId}" --runnergroup "Default" --name "${actionId}" --work "_work" --unattended --ephemeral --replace; \
       ./svc.sh install; \
       ./svc.sh start;
       `,

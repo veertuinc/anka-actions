@@ -36817,20 +36817,19 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseParams = exports.doAction = exports.getRunnerRegistrationUrl = void 0;
 const core = __importStar(__nccwpck_require__(5316));
 const anka_actions_common_1 = __nccwpck_require__(3547);
-// GitHub expects the org/owner web URL for config.sh, not owner/repo.
-// See: POST /repos/{owner}/{repo}/actions/runners/registration-token
-function getRunnerRegistrationUrl(ghBaseUrl, ghOwner) {
+// Repo-scoped registration tokens require the repository web URL in config.sh.
+function getRunnerRegistrationUrl(ghBaseUrl, ghOwner, ghRepo) {
     let webBaseUrl = ghBaseUrl.split('/api')[0];
     if (ghBaseUrl.match(/api\.github\.com/)) {
         webBaseUrl = 'https://github.com';
     }
-    return `${webBaseUrl}/${ghOwner}`;
+    return `${webBaseUrl}/${ghOwner}/${ghRepo}`;
 }
 exports.getRunnerRegistrationUrl = getRunnerRegistrationUrl;
 function doAction(actionId, runner, vm, params) {
     return __awaiter(this, void 0, void 0, function* () {
         const token = yield runner.createToken();
-        const registrationUrl = getRunnerRegistrationUrl(params.ghBaseUrl, params.ghOwner);
+        const registrationUrl = getRunnerRegistrationUrl(params.ghBaseUrl, params.ghOwner, params.ghRepo);
         const vmConfig = {
             count: 1,
             vmid: params.templateId,
@@ -36841,7 +36840,7 @@ function doAction(actionId, runner, vm, params) {
             node_id: params.node_id,
             startup_script: Buffer.from(`set -exo pipefail; \
       cd ${params.templateRunnerDir}; \
-      ./config.sh --url "${registrationUrl}" --token "${token}" --labels "${actionId}" --runnergroup "Default" --name "${actionId}" --work "_work"; \
+      ./config.sh --url "${registrationUrl}" --token "${token}" --labels "${actionId}" --runnergroup "Default" --name "${actionId}" --work "_work" --unattended --ephemeral --replace; \
       ./svc.sh install; \
       ./svc.sh start;
       `, 'binary').toString('base64'),
