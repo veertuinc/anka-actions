@@ -1,6 +1,6 @@
 import {expect, jest, test} from '@jest/globals'
 import {getBooleanInput, getInput} from '@actions/core'
-import {parseParams} from '../src/action'
+import {getRunnerRegistrationUrl, parseParams} from '../src/action'
 
 jest.mock('@actions/core')
 
@@ -9,6 +9,21 @@ const mockedGetBooleanInput = <jest.Mock<typeof getBooleanInput>>getBooleanInput
 
 beforeEach(() => {
   jest.clearAllMocks()
+})
+
+test('getRunnerRegistrationUrl uses org/owner web URL for github.com', () => {
+  expect(
+    getRunnerRegistrationUrl('https://api.github.com', 'veertuinc')
+  ).toEqual('https://github.com/veertuinc')
+})
+
+test('getRunnerRegistrationUrl uses org/owner web URL for GitHub Enterprise', () => {
+  expect(
+    getRunnerRegistrationUrl(
+      'https://github.example.com/api/v3',
+      'my-org'
+    )
+  ).toEqual('https://github.example.com/my-org')
 })
 
 test('parse all parameters', async () => {

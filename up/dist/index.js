@@ -36814,18 +36814,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseParams = exports.doAction = void 0;
+exports.parseParams = exports.doAction = exports.getRunnerRegistrationUrl = void 0;
 const core = __importStar(__nccwpck_require__(5316));
 const anka_actions_common_1 = __nccwpck_require__(3547);
+// GitHub expects the org/owner web URL for config.sh, not owner/repo.
+// See: POST /repos/{owner}/{repo}/actions/runners/registration-token
+function getRunnerRegistrationUrl(ghBaseUrl, ghOwner) {
+    let webBaseUrl = ghBaseUrl.split('/api')[0];
+    if (ghBaseUrl.match(/api\.github\.com/)) {
+        webBaseUrl = 'https://github.com';
+    }
+    return `${webBaseUrl}/${ghOwner}`;
+}
+exports.getRunnerRegistrationUrl = getRunnerRegistrationUrl;
 function doAction(actionId, runner, vm, params) {
     return __awaiter(this, void 0, void 0, function* () {
         const token = yield runner.createToken();
-        // remove api/v3 from urls before registering runner
-        let ghBaseUrl = params.ghBaseUrl.split('/api')[0];
-        // change url for github from the api.github.com to the normal one
-        if (params.ghBaseUrl.match(/api\.github\.com/))
-            ghBaseUrl = 'https://github.com';
-        const repoUrl = `${ghBaseUrl}/${params.ghOwner}/${params.ghRepo}`;
+        const registrationUrl = getRunnerRegistrationUrl(params.ghBaseUrl, params.ghOwner);
         const vmConfig = {
             count: 1,
             vmid: params.templateId,
@@ -36836,7 +36841,7 @@ function doAction(actionId, runner, vm, params) {
             node_id: params.node_id,
             startup_script: Buffer.from(`set -exo pipefail; \
       cd ${params.templateRunnerDir}; \
-      ./config.sh --url "${repoUrl}" --token "${token}" --labels "${actionId}" --runnergroup "Default" --name "${actionId}" --work "_work"; \
+      ./config.sh --url "${registrationUrl}" --token "${token}" --labels "${actionId}" --runnergroup "Default" --name "${actionId}" --work "_work"; \
       ./svc.sh install; \
       ./svc.sh start;
       `, 'binary').toString('base64'),
@@ -36845,7 +36850,7 @@ function doAction(actionId, runner, vm, params) {
             external_id: actionId
         };
         (0, anka_actions_common_1.logInfo)(`[VM] starting new instance with ${(0, anka_actions_common_1.logHighlight)('External ID', actionId)}`);
-        const instanceId = yield vm.start(actionId, repoUrl, token, params.templateRunnerDir, vmConfig);
+        const instanceId = yield vm.start(actionId, registrationUrl, token, params.templateRunnerDir, vmConfig);
         core.setOutput('action-id', actionId);
         let vmState = '';
         (0, anka_actions_common_1.logInfo)(`[VM] waiting for the VM instance to start...`);
