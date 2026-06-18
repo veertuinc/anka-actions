@@ -52,7 +52,7 @@ jobs:
   action-up:
     runs-on: ubuntu-latest
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         id: action-up
         with:
           gh-pat: ${{ secrets.SERVICE_USER_PAT }}
@@ -77,7 +77,7 @@ jobs:
     needs: [ action-up, inside_vm_job ]
     runs-on: ubuntu-latest
     steps:
-      - uses: veertuinc/anka-actions/down@v1
+      - uses: veertuinc/anka-actions/down@v2.0.0
         with:
           action-id: ${{ needs.action-up.outputs.action-id }}
           gh-pat: ${{ secrets.SERVICE_USER_PAT }}
@@ -88,7 +88,7 @@ jobs:
 
 ```yaml
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         with:
           controller-url: 'https://controller.mysite.com'
           controller-auth-cert-passphrase: 'secret'
@@ -103,7 +103,7 @@ We do not recommend this as it exposes your root token. The root token has acces
 
 ```yaml
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         with:
           controller-url: 'https://controller.mysite.com'
           controller-root-token: ${{ secrets.ROOT_TOKEN }}
@@ -115,7 +115,7 @@ The maximum seconds a job can run. If this TTL is reached it will stop and be ma
 
 ```yaml
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         with:
           controller-url: 'https://controller.mysite.com'
           job-ttl: 300
@@ -127,7 +127,7 @@ This is a interval between requests to your Anka Build Cloud Controller's REST A
 
 ```yaml
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         with:
           . . .
           controller-http-poll-delay: 5
@@ -137,7 +137,7 @@ This is a interval between requests to your Anka Build Cloud Controller's REST A
 
 ```yaml
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         with:
           template-id: 'template id'
           template-tag: 'template tag'
@@ -156,7 +156,7 @@ then set `gh-base-url` to `https://github.acme-inc.com/api/v3`
 
 ```yaml
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         with:
           . . .
           gh-base-url: 'https://github.acme-inc.com/api/v3'

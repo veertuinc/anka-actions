@@ -8,8 +8,8 @@ its own subfolder and is referenced by its path.
 
 | Action | Path | Description |
 | --- | --- | --- |
-| [Anka Actions - Up](up/README.md) | `veertuinc/anka-actions/up@v1` | Spins up a new Anka VM instance and registers a self-hosted runner. |
-| [Anka Actions - Down](down/README.md) | `veertuinc/anka-actions/down@v1` | Tears down the Anka VM instance and removes the runner. |
+| [Anka Actions - Up](up/README.md) | `veertuinc/anka-actions/up@v2.0.0` | Spins up a new Anka VM instance and registers a self-hosted runner. |
+| [Anka Actions - Down](down/README.md) | `veertuinc/anka-actions/down@v2.0.0` | Tears down the Anka VM instance and removes the runner. |
 
 ## Usage
 
@@ -20,7 +20,7 @@ jobs:
   action-up:
     runs-on: ubuntu-latest
     steps:
-      - uses: veertuinc/anka-actions/up@v1
+      - uses: veertuinc/anka-actions/up@v2.0.0
         id: action-up
         with:
           gh-pat: ${{ secrets.SERVICE_USER_PAT }}
@@ -41,7 +41,7 @@ jobs:
     needs: [ action-up, inside_vm_job ]
     runs-on: ubuntu-latest
     steps:
-      - uses: veertuinc/anka-actions/down@v1
+      - uses: veertuinc/anka-actions/down@v2.0.0
         with:
           action-id: ${{ needs.action-up.outputs.action-id }}
           gh-pat: ${{ secrets.SERVICE_USER_PAT }}
