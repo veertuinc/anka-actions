@@ -4,21 +4,45 @@ on:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
 
-  action-up:
+  resolve-tag:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
     steps:
-      - uses: veertuinc/anka-actions/up
+      - name: Resolve action release tag
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            tag="${{ github.event.release.tag_name }}"
+          else
+            tag="$(gh api "repos/${{ github.repository }}/releases/latest" --jq .tag_name)"
+          fi
+          echo "Testing published actions at tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  action-up:
+    needs: resolve-tag
+    runs-on: ubuntu-latest
+    outputs:
+      action-id: ${{ fromJSON(steps.action-up.outputs.outputs)['action-id'] }}
+    steps:
+      - uses: jenseng/dynamic-uses@v1
         id: action-up
         with:
-          gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
-          template-id: '9690461a-02b5-412d-8778-dab4167743db'
-          controller-url: ${{ secrets.CONTROLLER_URL }}
-          controller-auth-cert: ${{ secrets.CONTROLLER_VEERTU_COM_CERT }}
-          controller-auth-cert-key: ${{ secrets.CONTROLLER_VEERTU_COM_KEY }}
-    outputs:
-      action-id: ${{ steps.action-up.outputs.action-id }}
+          uses: veertuinc/anka-actions/up@${{ needs.resolve-tag.outputs.tag }}
+          with: |
+            gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
+            template-id: '9690461a-02b5-412d-8778-dab4167743db'
+            controller-url: ${{ secrets.CONTROLLER_URL }}
+            controller-auth-cert: ${{ secrets.CONTROLLER_VEERTU_COM_CERT }}
+            controller-auth-cert-key: ${{ secrets.CONTROLLER_VEERTU_COM_KEY }}
 
   inside_vm_job:
     needs: action-up
@@ -33,13 +57,15 @@ jobs:
 
   action_down:
     if: always()
-    needs: [ action-up, inside_vm_job ]
+    needs: [ resolve-tag, action-up, inside_vm_job ]
     runs-on: ubuntu-latest
     steps:
-      - uses: veertuinc/anka-actions/down
+      - uses: jenseng/dynamic-uses@v1
         with:
-          action-id: ${{ needs.action-up.outputs.action-id }}
-          gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
-          controller-url: ${{ secrets.CONTROLLER_URL }}
-          controller-auth-cert: ${{ secrets.CONTROLLER_VEERTU_COM_CERT }}
-          controller-auth-cert-key: ${{ secrets.CONTROLLER_VEERTU_COM_KEY }}
+          uses: veertuinc/anka-actions/down@${{ needs.resolve-tag.outputs.tag }}
+          with: |
+            action-id: ${{ needs.action-up.outputs.action-id }}
+            gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
+            controller-url: ${{ secrets.CONTROLLER_URL }}
+            controller-auth-cert: ${{ secrets.CONTROLLER_VEERTU_COM_CERT }}
+            controller-auth-cert-key: ${{ secrets.CONTROLLER_VEERTU_COM_KEY }}
