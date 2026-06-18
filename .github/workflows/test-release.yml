@@ -1,0 +1,45 @@
+name: 'test-release'
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+
+  action-up:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: veertuinc/anka-actions/up@v1
+        id: action-up
+        with:
+          gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
+          template-id: '9690461a-02b5-412d-8778-dab4167743db'
+          controller-url: ${{ secrets.CONTROLLER_URL }}
+          controller-auth-cert: ${{ secrets.CONTROLLER_VEERTU_COM_CERT }}
+          controller-auth-cert-key: ${{ secrets.CONTROLLER_VEERTU_COM_KEY }}
+    outputs:
+      action-id: ${{ steps.action-up.outputs.action-id }}
+
+  inside_vm_job:
+    needs: action-up
+    runs-on: [ self-hosted, "${{ needs.action-up.outputs.action-id }}" ]
+    steps:
+      - name: Inside VM Job
+        id: inside_vm_job
+        run: |
+          echo "running the actual job 1 on runner ${{ needs.action-up.outputs.action-id }}"
+          echo "user: $USER"
+          echo "home: $HOME"
+
+  action_down:
+    if: always()
+    needs: [ action-up, inside_vm_job ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: veertuinc/anka-actions/down@v1
+        with:
+          action-id: ${{ needs.action-up.outputs.action-id }}
+          gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
+          controller-url: ${{ secrets.CONTROLLER_URL }}
+          controller-auth-cert: ${{ secrets.CONTROLLER_VEERTU_COM_CERT }}
+          controller-auth-cert-key: ${{ secrets.CONTROLLER_VEERTU_COM_KEY }}

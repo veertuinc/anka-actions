@@ -65,7 +65,8 @@ configuration (certificate auth, root token auth, GitHub Enterprise Server, etc.
         ├── test.yml             # builds, lints, and tests every package
         ├── check-dist.yml       # verifies committed dist/ matches source
         ├── codeql-analysis.yml  # CodeQL security scanning across the repo
-        ├── test-demo.yml        # live up/down integration test (github.com)
+        ├── test-demo.yml        # live up/down integration test (github.com, local paths)
+        ├── test-release.yml     # live up/down integration test (published veertuinc/anka-actions/* tags)
         └── test-enterprise.yml  # live up/down integration test (GitHub Enterprise Server)
 ```
 
