@@ -1,0 +1,11 @@
+name: 'Anka Actions: Stub'
+description: "Stub: Don't use this action directly. Read [the documentation](https://github.com/veertuinc/anka-actions) instead."
+author: 'Veertu Inc.'
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Stub'
+      run: |
+        echo 'This is a stub. Read [the documentation](https://github.com/veertuinc/anka-actions) instead.'
+        exit 1
+      shell: bash
