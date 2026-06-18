@@ -1,4 +1,4 @@
-name: 'Anka Actions - Up'
+name: 'Anka Actions Up'
 description: 'Starts an Anka VM Instance through your Anka Build Cloud Controller and registers it as an ephemeral self-hosted GitHub Actions runner for your job.'
 author: 'Veertu Inc.'
 branding:

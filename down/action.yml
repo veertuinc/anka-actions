@@ -1,4 +1,4 @@
-name: 'Anka Actions - Down'
+name: 'Anka Actions Down'
 description: 'Terminates the Anka VM Instance through your Anka Build Cloud Controller and deregisters the ephemeral self-hosted GitHub Actions runner created by the up action.'
 author: 'Veertu Inc.'
 branding:
