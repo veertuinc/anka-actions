@@ -13,6 +13,8 @@ This action is mean to be used with [anka-actions-down](https://github.com/veert
 
    **`403 Resource not accessible by personal access token`?** Administration on the token is not enough. Also check: token owner is repo Admin; [org PAT settings](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization) allow fine-grained PATs, token is approved, and SAML SSO is authorized. Use a classic PAT with `repo` if fine-grained tokens are blocked.
 
+3. If running your first level runners (that execute the actions) on a macOS host, the runner process/binary must be added to the Local Network allow list. Open Settings → Privacy & Security → Local Network and add it there, then restart the runner service.
+
 ### Inputs
 
 | input name                          | required? | description                                                                                                                     |
