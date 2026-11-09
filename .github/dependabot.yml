@@ -2,14 +2,16 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    target-branch: edge
     schedule:
       interval: daily
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 5
 
   # Single root entry: npm workspaces share one lockfile at the repo root,
   # which covers the common/, up/, and down/ packages.
   - package-ecosystem: npm
     directory: /
+    target-branch: edge
     schedule:
       interval: daily
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 5
