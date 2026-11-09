@@ -51,11 +51,25 @@ jobs:
 See each action's README for the full list of inputs, outputs, and advanced
 configuration (certificate auth, root token auth, GitHub Enterprise Server, etc.).
 
+## Versions
+
+Examples in this repository use a full release tag, such as `@v2.0.0`. A full tag stays on that release commit.
+
+You can also follow the major version. These references track the latest stable `v2` release:
+
+```yaml
+- uses: veertuinc/anka-actions/up@v2
+- uses: veertuinc/anka-actions/down@v2
+```
+
+Publishing a stable release moves the major tag to that release commit. See [RELEASING.md](RELEASING.md).
+
 ## Repository layout
 
 ```
 .
 ├── package.json   # root npm workspaces manifest (common, up, down)
+├── RELEASING.md   # how a release is published; the major tag moves automatically
 ├── up/            # "Anka Actions - Up" action (action.yml + bundled dist/)
 ├── down/          # "Anka Actions - Down" action (action.yml + bundled dist/)
 ├── common/        # shared library, consumed by up/ and down/ as a workspace
@@ -67,7 +81,8 @@ configuration (certificate auth, root token auth, GitHub Enterprise Server, etc.
         ├── codeql-analysis.yml  # CodeQL security scanning across the repo
         ├── test-demo.yml        # live up/down integration test (github.com, local paths)
         ├── test-release.yml     # live up/down integration test (published veertuinc/anka-actions/* tags)
-        └── test-enterprise.yml  # live up/down integration test (GitHub Enterprise Server)
+        ├── test-enterprise.yml  # live up/down integration test (GitHub Enterprise Server)
+        └── update-major-tag.yml # moves the major tag (for example v2) when a release is published
 ```
 
 ## Development
