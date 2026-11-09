@@ -1,6 +1,6 @@
 {
   "name": "anka-actions-common",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": false,
   "description": "Shared TypeScript library for the Anka Build Cloud GitHub Actions, providing the Anka Controller VM and GitHub runner clients used by the up and down actions",
   "main": "lib/main.js",
