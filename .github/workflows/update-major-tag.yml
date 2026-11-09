@@ -1,0 +1,51 @@
+# When a stable release is published, move the major version tag to that
+# commit. A release tag v2.3.1 moves the lightweight tag v2.
+# Users then run veertuinc/anka-actions/up@v2 and down@v2 at that commit.
+# The full tag (v2.3.1) stays on the release commit.
+#
+# Prereleases do not move the major tag.
+# The push uses the default GITHUB_TOKEN (contents: write).
+name: Update major version tag
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-major-tag:
+    name: Move major version tag
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Derive the major tag
+        id: major
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_TAG" =~ ^v([0-9]+)\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Release tag '${RELEASE_TAG}' must use the form vMAJOR.MINOR.PATCH (example: v2.3.1)."
+            exit 1
+          fi
+          echo "major_tag=v${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          echo "release_tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout the release commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ steps.major.outputs.release_tag }}
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Force-update the major tag
+        env:
+          MAJOR_TAG: ${{ steps.major.outputs.major_tag }}
+          RELEASE_TAG: ${{ steps.major.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          git tag --force "$MAJOR_TAG" HEAD
+          git push origin "refs/tags/${MAJOR_TAG}" --force
+          echo "Moved ${MAJOR_TAG} to $(git rev-parse HEAD) for release ${RELEASE_TAG}."
