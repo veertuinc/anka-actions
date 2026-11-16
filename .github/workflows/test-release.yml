@@ -1,15 +1,26 @@
+# Checkout the release that was just published and run up and down from that commit.
+# workflow_dispatch takes the same tag as an input. Do not pin an old tag here.
 name: 'test-release'
 on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Full release tag to test. Example: v2.0.1'
+        required: true
+        type: string
 
 jobs:
 
   action-up:
     runs-on: ubuntu-latest
     steps:
-      - uses: 'veertuinc/anka-actions/up@v2.0.0'
+      - name: Checkout the release tag
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: ./up
         id: action-up
         with:
           gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
@@ -36,7 +47,11 @@ jobs:
     needs: [ action-up, inside_vm_job ]
     runs-on: ubuntu-latest
     steps:
-      - uses: 'veertuinc/anka-actions/down@v2.0.0'
+      - name: Checkout the release tag
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: ./down
         with:
           action-id: ${{ needs.action-up.outputs.action-id }}
           gh-pat: ${{ secrets.VEERTU_GITHUB_SERVICE_USER_PAT }}
