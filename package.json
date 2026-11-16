@@ -1,6 +1,6 @@
 {
   "name": "anka-actions",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "description": "Monorepo of Anka Build Cloud GitHub Actions (up, down) and their shared library (common)",
   "repository": {

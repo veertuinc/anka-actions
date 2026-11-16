@@ -1,6 +1,6 @@
 {
   "name": "anka-actions-down",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": false,
   "description": "GitHub Action that tears down the Anka Build Cloud VM and deregisters the ephemeral self-hosted runner created by the up action",
   "main": "lib/main.js",
