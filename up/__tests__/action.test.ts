@@ -93,7 +93,7 @@ test('parse pollDelay throws', async () => {
         return '2'
     }
   })
-  expect(parseParams()).rejects.toThrowError(
+  expect(parseParams()).rejects.toThrow(
     'controller-http-poll-delay must be positive integer'
   )
 })
@@ -109,7 +109,7 @@ test('parse hardTimeout throws', async () => {
         return '1'
     }
   })
-  expect(parseParams()).rejects.toThrowError(
+  expect(parseParams()).rejects.toThrow(
     'job-ttl must be greater then or equal to 0'
   )
 })
@@ -129,7 +129,7 @@ test('parse vcpu throws', async () => {
         return '0'
     }
   })
-  expect(parseParams()).rejects.toThrowError('vcpu must be positive integer')
+  expect(parseParams()).rejects.toThrow('vcpu must be positive integer')
 })
 
 test('parse vram throws', async () => {
@@ -147,7 +147,7 @@ test('parse vram throws', async () => {
         return '0'
     }
   })
-  expect(parseParams()).rejects.toThrowError('vram must be positive integer')
+  expect(parseParams()).rejects.toThrow('vram must be positive integer')
 })
 
 test('parse gh-base-url throws', async () => {
@@ -165,7 +165,5 @@ test('parse gh-base-url throws', async () => {
         return '0'
     }
   })
-  expect(parseParams()).rejects.toThrowError(
-    'gh-base-urls must include /api/v3'
-  )
+  expect(parseParams()).rejects.toThrow('gh-base-urls must include /api/v3')
 })

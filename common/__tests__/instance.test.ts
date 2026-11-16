@@ -87,7 +87,7 @@ test('fails to start VM', async () => {
           body
         )
       )
-        .rejects.toThrowError(new Error('API response status:FAIL'))
+        .rejects.toThrow(new Error('API response status:FAIL'))
         .then(result => {
           server.close()
           resolve(result)
@@ -194,7 +194,7 @@ test('get VM state terminated fails', async () => {
     server.listen(4444, () => {
       const vm = new VM('http://127.0.0.1:4444')
       expect(vm.getState('vmid'))
-        .rejects.toThrowError(
+        .rejects.toThrow(
           new Error(
             'VM failed to start: instance entered Terminated state: instance terminated by controller'
           )
@@ -238,7 +238,7 @@ test('get VM state error', async () => {
     server.listen(4444, () => {
       const vm = new VM('http://127.0.0.1:4444')
       expect(vm.getState('vmid'))
-        .rejects.toThrowError(
+        .rejects.toThrow(
           new Error(
             `VM failed to start: startup script exit code 127: sh: line 1: asdadfasdflakdsmnflaksdnfaklsdnf!@#$: command not found`
           )
