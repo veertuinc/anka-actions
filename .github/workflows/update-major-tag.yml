@@ -5,13 +5,21 @@
 #
 # Prereleases do not move the major tag.
 # The push uses the veertu-engineering-manager GitHub App when
-# GOVULNCHECK_APP_ID and GOVULNCHECK_APP_PRIVATE_KEY are set.
-# Without those secrets, the push uses GITHUB_TOKEN.
+# GOVULNCHECK_APP_ID and GOVULNCHECK_APP_PRIVATE_KEY are set
+# and that app is installed on this repository.
+# If the secrets are empty, or the app token cannot be created,
+# the push uses GITHUB_TOKEN.
 name: Update major version tag
 
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Full release tag to move the major tag for. Example: v2.0.1'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -19,7 +27,7 @@ permissions:
 jobs:
   update-major-tag:
     name: Move major version tag
-    if: ${{ !github.event.release.prerelease }}
+    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     steps:
       - name: Check for GitHub App credentials
@@ -37,6 +45,7 @@ jobs:
       - name: Create GitHub App token
         id: app-token
         if: steps.app-check.outputs.present == 'true'
+        continue-on-error: true
         uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.GOVULNCHECK_APP_ID }}
@@ -44,10 +53,14 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
 
+      - name: Warn when the GitHub App token is missing
+        if: steps.app-check.outputs.present == 'true' && steps.app-token.outcome != 'success'
+        run: echo "::warning::The GitHub App is not installed on this repository. The major tag push uses GITHUB_TOKEN."
+
       - name: Derive the major tag
         id: major
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
           set -euo pipefail
           if [[ ! "$RELEASE_TAG" =~ ^v([0-9]+)\.[0-9]+\.[0-9]+$ ]]; then
